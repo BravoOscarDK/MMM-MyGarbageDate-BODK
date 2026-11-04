@@ -1,0 +1,12 @@
+{
+  "name": "mmm-mygarbagedate-bodk",
+  "version": "1.0.0",
+  "description": "Waste2x PDF calendar to CSV updater for MagicMirror2",
+  "main": "MMM-MyGarbageDate-BODK.js",
+  "author": "BODK",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "check": "node --check MMM-MyGarbageDate-BODK.js && node --check node_helper.js"
+  }
+}
