@@ -252,7 +252,7 @@ module.exports = NodeHelper.create({
         typeof address !== "string" || typeof postalCode !== "string" || typeof expectedAddress !== "string" ||
         !address.trim() || !/^\d{4}$/.test(postalCode.trim()) ||
         typeof config.organizationId !== "string" || !config.organizationId || typeof config.outputFile !== "string" || !config.outputFile ||
-        typeof config.pythonPath !== "string" || !config.pythonPath) {
+        typeof config.pythonPath !== "string") {
       report(false, "Invalid configuration: address and a four-digit postalCode string are required"); return;
     }
     const args = ["-c", PYTHON_SCRIPT,
@@ -263,7 +263,7 @@ module.exports = NodeHelper.create({
     args.push("--address", address.trim(), "--postal-code", postalCode.trim());
     if (expectedAddress.trim()) args.push("--expected-address", expectedAddress.trim());
     this.running = true;
-    execFile(config.pythonPath, args, { cwd: this.path, timeout: 120000, maxBuffer: 1024 * 1024, windowsHide: true }, (error, stdout, stderr) => {
+    execFile(config.pythonPath || path.join(__dirname, ".venv", process.platform === "win32" ? "Scripts/python.exe" : "bin/python"), args, { cwd: this.path, timeout: 120000, maxBuffer: 1024 * 1024, windowsHide: true }, (error, stdout, stderr) => {
       this.running = false;
       if (error) {
         const message = (stderr || error.message).trim().slice(0, 2000);

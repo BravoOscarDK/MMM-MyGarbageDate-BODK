@@ -18,18 +18,17 @@ Clone this repository into ~/MagicMirror/modules/, next to MMM-MyGarbage-BODK.
 cd ~/MagicMirror/modules
 git clone https://github.com/BravoOscarDK/MMM-MyGarbageDate-BODK.git
 cd MMM-MyGarbageDate-BODK
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+npm install
 ```
 
-No additional npm dependencies are required. All backend logic, including the Python PDF parser, is contained in node_helper.js. The helper invokes Python directly without separate converter files. Add this entry to the modules array in config/config.js and adjust the absolute Python path:
+Run `npm install` to set up the Python environment automatically. All backend logic, including the Python PDF parser, is contained in node_helper.js. The helper invokes Python directly without separate converter files. Add this entry to the modules array in config/config.js :
 
 ```js
 {
   module: "MMM-MyGarbageDate-BODK",
   position: "bottom_left",
   config: {
-    pythonPath: "/home/pi/MagicMirror/modules/MMM-MyGarbageDate-BODK/.venv/bin/python",
+    language: "en",
     address: "Example Street 123",
     postalCode: "0000",
     outputFile: "../MMM-MyGarbage-BODK/garbage_schedule.csv"
@@ -45,7 +44,7 @@ The address and postal code above are fictional placeholders. Replace both with 
 
 | Option | Default | Description |
 | --- | --- | --- |
-| pythonPath | python3 | Python executable or absolute path; no shell arguments. |
+| pythonPath | empty (module .venv) | Python executable or absolute path; no shell arguments. |
 | address | empty string | Required: exact street name and house number. |
 | postalCode | empty string | Required: your four-digit postal code as a string. |
 | expectedAddress | empty string | Optional additional PDF text check. The matched location is always checked automatically. |
@@ -111,3 +110,9 @@ This checks JavaScript syntax. The integrated parser, address matching, CSV repl
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Language
+
+English is the default, independently of the MagicMirror global language. Set `language: "da"` in this module's `config` for Danish, or `language: "en"` for English. Unsupported languages fall back to English. Custom labels and device names retain their configured values. Technical logs and diagnostic errors are in English.
+
+`npm install` creates a local `.venv` and installs the Python packages in `requirements.txt`. Python 3 with venv and pip support must be installed first (on Raspberry Pi OS: `sudo apt install python3-venv python3-pip`). Set `PYTHON` during installation to choose another Python executable. System display commands and hardware access still require operating-system setup. Run `npm install` after `git pull --ff-only`.

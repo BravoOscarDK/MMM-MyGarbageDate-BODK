@@ -7,6 +7,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "check": "node --check MMM-MyGarbageDate-BODK.js && node --check node_helper.js"
+    "check": "node --check MMM-MyGarbageDate-BODK.js && node --check node_helper.js",
+    "postinstall": "node scripts/install-python.js",
+    "test": "node --test"
   }
 }
