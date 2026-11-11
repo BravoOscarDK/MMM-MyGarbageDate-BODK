@@ -12,6 +12,14 @@ Last download: 04/11/2026 21:45 | OK | 93 dates
 
 The timestamp records when the PDF finished downloading, in the mirror browser's local timezone (DD/MM/YYYY HH:mm). OK confirms successful parsing and CSV replacement. The count represents distinct collection dates.
 
+### Preview
+
+Successful download status using a fictional timestamp and date count. This module generates the CSV; collection pictograms are displayed by MMM-MyGarbage-BODK. English is the default language.
+
+![MyGarbageDate example with fictional data](docs/images/example.png)
+
+The [browser preview](docs/preview.html) uses fictional data only; it does not validate external services or hardware.
+
 ## Requirements
 
 A working MagicMirror² installation and a Node.js version supported by that installation.
