@@ -81,7 +81,7 @@ The address and postal code above are fictional placeholders. Replace both with 
 | `updateInterval` | `86400000` | Milliseconds between updates; default 24 hours, minimum one minute. |
 | `showStatus` | `true` | Display download time, success status and date count. |
 
-Downloads run at startup and at each interval. Failed updates retain the last successful timestamp and count and append "Latest update failed". Without a successful download in the current session, errors display "Calendar download failed". Details are logged on the server. Status is not persisted across restarts; restarting triggers a fresh download.
+Updates are checked at startup and at each interval. A successful download is reused for the rest of the server's local calendar day, including after a restart. The module stores update metadata in its `.cache` directory. If the CSV is missing or changed, the calendar year or address settings change, or metadata is unavailable, the module downloads again. Failed updates can be retried at the next interval and preserve the existing CSV. The display retains the last successful timestamp and count and appends "Latest update failed"; without a successful update in the current session, errors display "Calendar download failed". Details are logged on the server.
 
 The collection display module reads its CSV hourly, so updated collections may take up to one hour to appear.
 

@@ -1,4 +1,5 @@
 .venv/
+.cache/
 __pycache__/
 *.pdf
 garbage_schedule.csv

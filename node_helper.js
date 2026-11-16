@@ -1,6 +1,11 @@
 const NodeHelper = require("node_helper");
 const { execFile } = require("node:child_process");
 const path = require("node:path");
+const fs = require("node:fs");
+const crypto = require("node:crypto");
+
+const hash = (value) => crypto.createHash("sha256").update(value).digest("hex");
+const sameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
 // Runtime PDF processing is embedded here so no standalone converter is required.
 // PyMuPDF supplies the vector drawing information used by the calendar parser.
@@ -255,10 +260,25 @@ module.exports = NodeHelper.create({
         typeof config.pythonPath !== "string") {
       report(false, "Invalid configuration: address and a four-digit postalCode string are required"); return;
     }
+    const output = path.resolve(this.path, config.outputFile);
+    const metadataPath = path.join(this.path, ".cache", hash(output) + ".json");
+    const settingsHash = hash(JSON.stringify([year, address.trim(), postalCode.trim(), expectedAddress.trim(), config.organizationId]));
+    try {
+      const saved = JSON.parse(fs.readFileSync(metadataPath, "utf8"));
+      const downloaded = new Date(saved.downloadedAt);
+      if (saved.settingsHash === settingsHash && Number.isFinite(downloaded.getTime()) &&
+          sameDay(downloaded, new Date()) && Number.isInteger(saved.dateCount) && saved.dateCount >= 30 &&
+          saved.outputHash === hash(fs.readFileSync(output))) {
+        report(true, undefined, { dateCount: saved.dateCount, downloadedAt: saved.downloadedAt });
+        return;
+      }
+    } catch (_) {
+      // Missing or invalid metadata or output requires a fresh update.
+    }
     const args = ["-c", PYTHON_SCRIPT,
       "--year", String(year),
       "--organization-id", config.organizationId,
-      "--output", path.resolve(this.path, config.outputFile), "--json"
+      "--output", output, "--json"
     ];
     args.push("--address", address.trim(), "--postal-code", postalCode.trim());
     if (expectedAddress.trim()) args.push("--expected-address", expectedAddress.trim());
@@ -274,6 +294,13 @@ module.exports = NodeHelper.create({
           const result = JSON.parse(stdout);
           if (!Number.isInteger(result.dateCount) || result.dateCount < 30 || !Number.isFinite(Date.parse(result.downloadedAt))) {
             throw new Error("Invalid conversion result");
+          }
+          try {
+            const metadata = { settingsHash, outputHash: hash(fs.readFileSync(output)), dateCount: result.dateCount, downloadedAt: result.downloadedAt };
+            fs.mkdirSync(path.dirname(metadataPath), { recursive: true });
+            fs.writeFileSync(metadataPath, JSON.stringify(metadata), { mode: 0o600 });
+          } catch (metadataError) {
+            console.error("[MMM-MyGarbageDate-BODK] Could not save update metadata:", metadataError.message);
           }
           console.log("[MMM-MyGarbageDate-BODK]", stdout.trim());
           report(true, undefined, { dateCount: result.dateCount, downloadedAt: result.downloadedAt });
